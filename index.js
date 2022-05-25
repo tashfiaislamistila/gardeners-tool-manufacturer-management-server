@@ -16,6 +16,7 @@ async function run() {
     try {
         await client.connect();
         const toolCollection = client.db('gardenres_tool_management').collection('tools');
+        const orderCollection = client.db('gardenres_tool_management').collection('orders');
         //tools API
         app.get('/tools', async (req, res) => {
             const query = {};
@@ -44,6 +45,19 @@ async function run() {
             const result = await toolCollection.updateOne(filter, updatedTools, options);
             res.send(result);
         });
+        app.post('/orders', async (req, res) => {
+            const order = req.body;
+            const result = await orderCollection.insertOne(order);
+            res.send(result);
+        });
+
+        //api for particular user
+        app.get('/orders', async (req, res) => {
+            const customerEmail = req.query.customerEmail;
+            const query = { customerEmail: customerEmail };
+            const bookings = await orderCollection.find(query).toArray();
+            res.send(bookings);
+        })
     }
     finally {
 
