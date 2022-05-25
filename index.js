@@ -30,6 +30,20 @@ async function run() {
             const tool = await toolCollection.findOne(query);
             res.send(tool);
         });
+        //PUT
+        app.put('/tools/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateQuantity = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedTools = {
+                $set: {
+                    availableQuantity: updateQuantity.availableQuantity,
+                }
+            };
+            const result = await toolCollection.updateOne(filter, updatedTools, options);
+            res.send(result);
+        });
     }
     finally {
 
