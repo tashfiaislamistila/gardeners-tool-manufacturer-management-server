@@ -17,6 +17,7 @@ async function run() {
         await client.connect();
         const toolCollection = client.db('gardenres_tool_management').collection('tools');
         const orderCollection = client.db('gardenres_tool_management').collection('orders');
+        const userCollection = client.db('gardenres_tool_management').collection('users');
         //tools API
         app.get('/tools', async (req, res) => {
             const query = {};
@@ -55,9 +56,24 @@ async function run() {
         app.get('/orders', async (req, res) => {
             const customerEmail = req.query.customerEmail;
             const query = { customerEmail: customerEmail };
-            const bookings = await orderCollection.find(query).toArray();
-            res.send(bookings);
+            const purchases = await orderCollection.find(query).toArray();
+            res.send(purchases);
+        });
+
+        // insert and update user for login
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
         })
+
+
     }
     finally {
 
