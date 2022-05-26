@@ -87,6 +87,15 @@ async function run() {
             const users = await userCollection.find().toArray();
             res.send(users)
         })
+
+        //which user login is admin check this
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
+        })
+
         //make admin 
         app.put('/user/admin/:email', verifyJwt, async (req, res) => {
             const email = req.params.email;
