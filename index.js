@@ -35,6 +35,7 @@ async function run() {
         const toolCollection = client.db('gardenres_tool_management').collection('tools');
         const orderCollection = client.db('gardenres_tool_management').collection('orders');
         const userCollection = client.db('gardenres_tool_management').collection('users');
+        const reviewCollection = client.db('gardenres_tool_management').collection('review');
 
         const verifyAdmin = async (req, res, next) => {
             const requester = req.decoded.email;
@@ -82,9 +83,28 @@ async function run() {
             const result = await toolCollection.updateOne(filter, updatedTools, options);
             res.send(result);
         });
+
+        //delete api tools
+        app.delete('/tools/:id', verifyJwt, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await toolCollection.deleteOne(filter);
+            res.send(result);
+        });
+
+        //add product api when i add tools from font end this api help to add data in backend 
         app.post('/orders', async (req, res) => {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
+            res.send(result);
+        });
+
+
+        //delete api when i want to delete tools from font end this api help to data data from backend 
+        app.delete('/orders/:id', verifyJwt, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(filter);
             res.send(result);
         });
 
@@ -124,10 +144,7 @@ async function run() {
             };
             const result = await userCollection.updateOne(filter, updateDoc);
             res.send(result);
-
-
         })
-
         // insert and update user for login
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
@@ -141,14 +158,6 @@ async function run() {
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
             res.send({ result, token });
         });
-        //delete api
-        app.delete('/tools/:id', verifyJwt, verifyAdmin, async (req, res) => {
-            const id = req.params.id;
-            const filter = { _id: ObjectId(id) };
-            const result = await toolCollection.deleteOne(filter);
-            res.send(result);
-        })
-
 
     }
     finally {
