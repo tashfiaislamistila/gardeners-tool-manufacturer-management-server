@@ -35,6 +35,7 @@ async function run() {
         const toolCollection = client.db('gardenres_tool_management').collection('tools');
         const orderCollection = client.db('gardenres_tool_management').collection('orders');
         const userCollection = client.db('gardenres_tool_management').collection('users');
+
         //tools API
         app.get('/tools', async (req, res) => {
             const query = {};
@@ -42,6 +43,13 @@ async function run() {
             const tools = await cursor.toArray();
             res.send(tools);
         });
+
+        app.post('/tools', verifyJwt, async (req, res) => {
+            const product = req.body;
+            const result = await toolCollection.insertOne(product);
+            res.send(result);
+        })
+
         //get single tools API
         app.get('/tools/:id', async (req, res) => {
             const id = req.params.id;
