@@ -56,6 +56,8 @@ async function run() {
         //api for particular user
         app.get('/orders', async (req, res) => {
             const customerEmail = req.query.customerEmail;
+            const authorization = req.headers.authorization;
+            console.log('auth header', authorization);
             const query = { customerEmail: customerEmail };
             const purchases = await orderCollection.find(query).toArray();
             res.send(purchases);
