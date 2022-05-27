@@ -38,6 +38,7 @@ async function run() {
         const orderCollection = client.db('gardenres_tool_management').collection('orders');
         const userCollection = client.db('gardenres_tool_management').collection('users');
         const reviewCollection = client.db('gardenres_tool_management').collection('review');
+        const paymentCollection = client.db('gardenres_tool_management').collection('payments');
 
         const verifyAdmin = async (req, res, next) => {
             const requester = req.decoded.email;
@@ -181,6 +182,24 @@ async function run() {
             });
             res.send({ clientSecret: paymentIntent.client_secret })
         });
+
+        //updated client payment information by patch
+        app.patch('/orders/:id', verifyJwt, async (req, res) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    paid: true,
+                    TransitionId: payment.transactionId,
+
+                }
+            }
+            const result = await paymentCollection.insertOne(payment);
+            const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
+            res.send(updatedDoc);
+
+        })
     }
     finally {
 
