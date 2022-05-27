@@ -39,6 +39,7 @@ async function run() {
         const userCollection = client.db('gardenres_tool_management').collection('users');
         const reviewCollection = client.db('gardenres_tool_management').collection('review');
         const paymentCollection = client.db('gardenres_tool_management').collection('payments');
+        const profileCollection = client.db('gardenres_tool_management').collection('profiles');
 
         const verifyAdmin = async (req, res, next) => {
             const requester = req.decoded.email;
@@ -87,6 +88,18 @@ async function run() {
             res.send(result);
         });
 
+        //for my profile put data from body
+        app.put('/profiles/:email', async (req, res) => {
+            const email = req.params.email;
+            const profiles = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: profiles,
+            };
+            const result = await profileCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        });
         //delete api tools
         app.delete('/tools/:id', verifyJwt, verifyAdmin, async (req, res) => {
             const id = req.params.id;
@@ -191,7 +204,7 @@ async function run() {
             const updatedDoc = {
                 $set: {
                     paid: true,
-                    TransitionId: payment.transactionId,
+                    transactionId: payment.transactionId,
 
                 }
             }
