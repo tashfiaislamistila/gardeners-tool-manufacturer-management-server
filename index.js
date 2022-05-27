@@ -122,6 +122,15 @@ async function run() {
             }
         });
 
+        //particular order for payment api with get
+        app.get('/orders/:id', verifyJwt, async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const orders = await orderCollection.findOne(query);
+            res.send(orders);
+        })
+
+
         app.get('/users', verifyJwt, async (req, res) => {
             const users = await userCollection.find().toArray();
             res.send(users)
