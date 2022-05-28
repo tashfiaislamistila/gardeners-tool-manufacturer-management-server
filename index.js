@@ -37,7 +37,7 @@ async function run() {
         const toolCollection = client.db('gardenres_tool_management').collection('tools');
         const orderCollection = client.db('gardenres_tool_management').collection('orders');
         const userCollection = client.db('gardenres_tool_management').collection('users');
-        const reviewCollection = client.db('gardenres_tool_management').collection('review');
+        const reviewCollection = client.db('gardenres_tool_management').collection('reviews');
         const paymentCollection = client.db('gardenres_tool_management').collection('payments');
         const profileCollection = client.db('gardenres_tool_management').collection('profiles');
 
@@ -100,6 +100,33 @@ async function run() {
             const result = await profileCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
         });
+
+        //create review api for db
+        app.get('/reviews', async (req, res) => {
+            const query = {};
+            const cursor = reviewCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        });
+        //insert one by one review in collection
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send({ success: true, result });
+        })
+        // //for review added put data from body
+        // app.put('/reviews/:email', verifyJwt, verifyAdmin, async (req, res) => {
+        //     const email = req.params.email;
+        //     const reviews = req.body;
+        //     const filter = { email: email };
+        //     const options = { upsert: true };
+        //     const updatedDoc = {
+        //         $set: reviews,
+        //     };
+        //     const result = await reviewCollection.updateOne(filter, updatedDoc, options);
+        //     res.send(result);
+        // });
+
         //delete api tools
         app.delete('/tools/:id', verifyJwt, verifyAdmin, async (req, res) => {
             const id = req.params.id;
@@ -150,6 +177,12 @@ async function run() {
         app.get('/users', verifyJwt, async (req, res) => {
             const users = await userCollection.find().toArray();
             res.send(users)
+        })
+
+        //get Api for manage orders by admin
+        app.get('/orders', verifyJwt, async (req, res) => {
+            const manageOrders = await orderCollection.find().toArray();
+            res.send(manageOrders)
         })
 
         //which user login is admin check this
