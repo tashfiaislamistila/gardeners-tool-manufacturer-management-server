@@ -60,21 +60,21 @@ async function run() {
             res.send(tools);
         });
 
-        app.post('/tools', verifyJwt, verifyAdmin, async (req, res) => {
+        app.post('/tools', async (req, res) => {
             const product = req.body;
             const result = await toolCollection.insertOne(product);
             res.send(result);
         })
 
         //get single tools API
-        app.get('/tools/:id', verifyJwt, async (req, res) => {
+        app.get('/tools/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const tool = await toolCollection.findOne(query);
             res.send(tool);
         });
         //PUT
-        app.put('/tools/:id', verifyJwt, async (req, res) => {
+        app.put('/tools/:id', async (req, res) => {
             const id = req.params.id;
             const updateQuantity = req.body;
             const filter = { _id: ObjectId(id) };
