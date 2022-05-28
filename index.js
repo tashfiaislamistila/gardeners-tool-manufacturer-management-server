@@ -247,6 +247,10 @@ run().catch(console.dir);
 app.get('/', (req, res) => {
     res.send('Hello from gardeners tool management !')
 })
+//test
+app.get('/test', (req, res) => {
+    res.send('test!!')
+})
 
 app.listen(port, () => {
     console.log(`gardeners tool management App listening on port ${port}`)
