@@ -67,14 +67,14 @@ async function run() {
         })
 
         //get single tools API
-        app.get('/tools/:id', async (req, res) => {
+        app.get('/tools/:id', verifyJwt, async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const tool = await toolCollection.findOne(query);
             res.send(tool);
         });
         //PUT
-        app.put('/tools/:id', async (req, res) => {
+        app.put('/tools/:id', verifyJwt, async (req, res) => {
             const id = req.params.id;
             const updateQuantity = req.body;
             const filter = { _id: ObjectId(id) };
@@ -114,18 +114,6 @@ async function run() {
             const result = await reviewCollection.insertOne(review);
             res.send({ success: true, result });
         })
-        // //for review added put data from body
-        // app.put('/reviews/:email', verifyJwt, verifyAdmin, async (req, res) => {
-        //     const email = req.params.email;
-        //     const reviews = req.body;
-        //     const filter = { email: email };
-        //     const options = { upsert: true };
-        //     const updatedDoc = {
-        //         $set: reviews,
-        //     };
-        //     const result = await reviewCollection.updateOne(filter, updatedDoc, options);
-        //     res.send(result);
-        // });
 
         //delete api tools
         app.delete('/tools/:id', verifyJwt, verifyAdmin, async (req, res) => {
@@ -136,7 +124,7 @@ async function run() {
         });
 
         //add product api when i add tools from font end this api help to add data in backend 
-        app.post('/orders', async (req, res) => {
+        app.post('/orders', verifyJwt, verifyAdmin, async (req, res) => {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
             res.send(result);
@@ -144,7 +132,7 @@ async function run() {
 
 
         //delete api when i want to delete tools from font end this api help to data data from backend 
-        app.delete('/orders/:id', verifyJwt, verifyAdmin, async (req, res) => {
+        app.delete('/orders/:id', verifyJwt, async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
             const result = await orderCollection.deleteOne(filter);
@@ -164,7 +152,11 @@ async function run() {
                 return res.status(403).send({ message: 'Forbidden access' });
             }
         });
-
+        //get Api for manage orders by admin
+        app.get('/manageOrders', verifyJwt, verifyAdmin, async (req, res) => {
+            const manageOrders = await orderCollection.find().toArray();
+            res.send(manageOrders)
+        })
         //particular order for payment api with get
         app.get('/orders/:id', verifyJwt, async (req, res) => {
             const id = req.params.id;
@@ -179,11 +171,6 @@ async function run() {
             res.send(users)
         })
 
-        //get Api for manage orders by admin
-        app.get('/orders', verifyJwt, async (req, res) => {
-            const manageOrders = await orderCollection.find().toArray();
-            res.send(manageOrders)
-        })
 
         //which user login is admin check this
         app.get('/admin/:email', async (req, res) => {
@@ -233,9 +220,11 @@ async function run() {
         app.patch('/orders/:id', verifyJwt, async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
+            // console.log(payment);
             const filter = { _id: ObjectId(id) };
             const updatedDoc = {
                 $set: {
+                    status: payment.status,
                     paid: true,
                     transactionId: payment.transactionId,
 
