@@ -124,7 +124,7 @@ async function run() {
         });
 
         //add product api when i add tools from font end this api help to add data in backend 
-        app.post('/orders', verifyJwt, verifyAdmin, async (req, res) => {
+        app.post('/orders', verifyJwt, async (req, res) => {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
             res.send(result);
